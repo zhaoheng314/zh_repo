@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.zzti.sys.dao.ISysRoleUserDao">
+
+	<resultMap type="cn.edu.zzti.sys.entity.SysRoleUser" id="BaseResultMap">
+		<result property="id" column="id" jdbcType="BIGINT" />
+		<result property="roleId" column="role_id" jdbcType="BIGINT" />
+		<result property="userId" column="user_id" jdbcType="BIGINT" />
+		<result property="createDate" column="create_date" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,role_id,user_id,create_date
+	</sql>
+    
+    <!-- 根据用户编号获得角色编号 -->
+    <select id="getRoleIdByUserId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select role_id
+        from rt_sys_role_user
+        where user_id = #{userId,jdbcType=BIGINT}
+    </select>
+    
+    <!-- 获取拥有角色的用户列表,分页 -->
+    <select id="getRoleUserList" resultType="java.util.Map" parameterType="java.util.Map">
+        select 
+        rt.id as id,
+        rt.role_id as roleId,
+        rt.user_id as userId,
+        rt.create_date as createDate,
+        user.username as username,
+        role.role_name as roleName
+        from rt_sys_role_user rt, tb_sys_user user, tb_sys_role role
+        where
+        rt.role_id = role.id
+        and rt.user_id = user.id
+        <if test="roleId != null and roleId != 0">
+            and rt.role_id = #{roleId,jdbcType=BIGINT}
+        </if>
+        order by rt.id desc
+        limit #{page.start},#{page.limit}
+    </select>
+    
+    <!-- 获取没有角色的用户列表,分页 -->
+    <select id="getNoRoleUserList" resultType="java.util.Map" >
+        select 
+        user.id as userId,
+        user.username as username,
+        user.realname as realname,
+        user.create_date as createDate,
+        user.update_date as updateDate
+        from tb_sys_user user
+        where user.user_status &lt;&gt; -1
+        and user.id not in (select user_id from rt_sys_role_user)
+        order by user.id desc
+        limit #{page.start},#{page.limit}
+    </select>
+    
+    <!-- 获取拥有角色的用户数量 -->
+    <select id="getRoleUserNumber" parameterType="java.util.Map" resultType="int">
+        select count(id) 
+        from rt_sys_role_user
+        <if test="roleId != null and roleId != 0">
+            where role_id = #{roleId,jdbcType=BIGINT}
+        </if>
+    </select>
+    
+    <!-- 获取没有角色的用户数量 -->
+    <select id="getNoRoleUserNumber" resultType="int">
+        select count(user.id)
+        from tb_sys_user user
+        where user.user_status &lt;&gt; -1
+        and user.id not in (select user_id from rt_sys_role_user)
+    </select>
+    
+    <!-- 批量插入记录 -->
+    <insert id="insertList" parameterType="java.util.List">
+        insert
+        into rt_sys_role_user (role_id, user_id, create_date)
+        values 
+        <foreach collection="list" item="sysRoleUser" separator=",">
+			(
+			#{sysRoleUser.roleId,jdbcType=BIGINT},
+			#{sysRoleUser.userId,jdbcType=BIGINT},
+			#{sysRoleUser.createDate,jdbcType=TIMESTAMP}
+			)
+		</foreach>
+    </insert>
+    
+    <!-- 根据主键删除一条记录 -->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete 
+        from rt_sys_role_user
+        where id = #{id,jdbcType=BIGINT} 
+    </delete>
+</mapper>

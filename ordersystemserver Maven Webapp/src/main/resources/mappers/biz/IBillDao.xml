@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.zzti.biz.dao.IBillDao">
+
+	<resultMap type="cn.edu.zzti.biz.entity.Bill" id="BaseResultMap">
+		<result property="id" column="id" jdbcType="BIGINT" />
+		<result property="tableId" column="table_id" jdbcType="BIGINT" />
+		<result property="userId" column="user_id" jdbcType="BIGINT" />
+		<result property="dishIds" column="dish_ids" jdbcType="VARCHAR" />
+		<result property="dishNums" column="dish_nums" jdbcType="VARCHAR" />
+		<result property="ifMember" column="if_member" jdbcType="INTEGER" />
+		<result property="totalMoney" column="total_money" jdbcType="INTEGER" />
+		<result property="createDate" column="create_date" jdbcType="TIMESTAMP" />
+		<result property="updateDate" column="update_date" jdbcType="TIMESTAMP" />
+		<result property="billStatus" column="bill_status" jdbcType="INTEGER" />	
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,table_id,user_id,dish_ids,dish_nums,if_member,total_money,create_date,update_date,bill_status
+	</sql>
+	
+	<!-- 根据主键查询账单信息 -->
+	<select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+	    select
+	    <include refid="Base_Column_List" />
+        from tb_os_bill
+        where id = #{id,jdbcType=BIGINT}
+	</select>
+	
+	<!-- 获取账单列表，分页 -->
+	<select id="getBillList" parameterType="java.util.Map" resultMap="BaseResultMap">
+	    select
+	    <include refid="Base_Column_List" />
+        from tb_os_bill
+        order by id desc
+	   	limit #{page.start},#{page.limit}
+	</select>
+	
+	<!-- 获取账单总数 -->
+	<select id="getCount" resultType="int">
+	    select count(id)
+	    from tb_os_bill
+	</select>
+	
+	<!-- 插入一条账单信息 -->
+	<insert id="insert" parameterType="cn.edu.zzti.biz.entity.Bill">
+	    insert into tb_os_bill (id, table_id, user_id, dish_ids, 
+	       dish_nums, if_member, total_money, create_date, update_date, bill_status) 
+	    values(#{id,jdbcType=BIGINT},#{tableId,jdbcType=BIGINT},#{userId,jdbcType=BIGINT},#{dishIds,jdbcType=VARCHAR},
+	       #{dishNums,jdbcType=VARCHAR},#{ifMember,jdbcType=INTEGER},#{totalMoney,jdbcType=INTEGER},#{createDate,jdbcType=TIMESTAMP},#{updateDate,jdbcType=TIMESTAMP},#{billStatus,jdbcType=INTEGER})
+	</insert>
+	
+	<!-- 有选择的更新账单信息 -->
+	<update id="updateByPrimaryKeySelective" parameterType="cn.edu.zzti.biz.entity.Bill">
+	    update tb_os_bill
+        <set>
+        <if test="tableId != null" >
+          table_id = #{tableId,jdbcType=BIGINT},
+        </if>
+         <if test="userId != null" >
+          user_id = #{userId,jdbcType=BIGINT},
+        </if>
+        <if test="dishIds != null" >
+          dish_ids = #{dishIds,jdbcType=VARCHAR},
+        </if>
+        <if test="dishNums != null" >
+          dish_nums = #{dishNums,jdbcType=VARCHAR},
+        </if>
+        <if test="ifMember != null" >
+          if_member = #{ifMember,jdbcType=INTEGER},
+        </if>
+         <if test="totalMoney != null" >
+          total_money = #{totalMoney,jdbcType=INTEGER},
+        </if>
+        <if test="createDate != null" >
+          create_date = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateDate != null" >
+          update_date = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="billStatus != null" >
+          bill_status = #{billStatus,jdbcType=INTEGER},
+        </if>      
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<!-- 根据主键删除账单信息 -->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from tb_os_bill
+        where id = #{id,jdbcType=BIGINT}
+    </delete>	
+</mapper>

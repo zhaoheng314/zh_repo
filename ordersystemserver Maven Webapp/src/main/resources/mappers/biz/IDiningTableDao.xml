@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.zzti.biz.dao.IDiningTableDao">
+
+	<resultMap type="cn.edu.zzti.biz.entity.DiningTable" id="BaseResultMap">
+		<result property="id" column="id" jdbcType="BIGINT" />
+		<result property="tableCode" column="table_code" jdbcType="VARCHAR" />
+		<result property="tableSize" column="table_size" jdbcType="INTEGER" />
+		<result property="createDate" column="create_date" jdbcType="TIMESTAMP" />
+		<result property="updateDate" column="update_date" jdbcType="TIMESTAMP" />
+		<result property="tableStatus" column="table_status" jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,table_code,table_size,create_date,update_date,table_status
+	</sql>
+	
+	<!-- 根据主键获取餐桌对象 -->
+	<select id="selectByPrimiaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+	    select 
+	    <include refid="Base_Column_List" />
+	    from tb_os_dining_table
+	    where table_status &lt;&gt; -1
+	    and id = #{id,jdbcType=BIGINT}
+	</select>
+	
+	<!-- 获取餐桌列表，分页 -->
+	<select id="getDiningTableList" parameterType="java.util.Map" resultMap="BaseResultMap">
+	    select
+	    <include refid="Base_Column_List" />
+	    from tb_os_dining_table t
+	    where t.table_status &lt;&gt; -1
+	    order by id asc
+	    limit #{page.start},#{page.limit}
+	</select>
+	
+	<!-- 获取餐桌总数 -->
+	<select id="getCount" resultType="int">
+	    select count(id)
+	    from tb_os_dining_table
+	    where table_status &lt;&gt; -1
+	</select>
+	
+	<!-- 通过餐桌代码获取餐桌数量 -->
+	<select id="getTableNumber" parameterType="java.util.Map" resultType="int">
+	    select count(id)
+	    from tb_os_dining_table t
+	    where t.table_code = #{tableCode,jdbcType=VARCHAR} 
+	    and t.table_status &lt;&gt; -1
+	    <if test="op != null and op != '' and op == 'modify' " >
+	    and id &lt;&gt; #{id,jdbcType=BIGINT}
+	    </if>
+	</select>
+	
+	<select id="getAllTables" parameterType="java.util.Map" resultMap="BaseResultMap">
+	    select
+	    <include refid="Base_Column_List" />
+	    from tb_os_dining_table t
+	    where t.table_status &lt;&gt; -1
+	    <if test="tableId != null and tableId != ''">
+	    and id &lt;&gt; #{tableId,jdbcType=BIGINT}
+	    </if>
+	    order by id asc
+	</select>
+	
+	<!-- 插入一条餐桌记录 -->
+	<insert id="insert" parameterType="cn.edu.zzti.biz.entity.DiningTable">
+	    insert into tb_os_dining_table (id, table_code, table_size, create_date, 
+	       update_date, table_status)
+	    values (#{id,jdbcType=BIGINT}, #{tableCode,jdbcType=VARCHAR}, #{tableSize,jdbcType=INTEGER}, 
+	       #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP},  #{tableStatus,jdbcType=INTEGER})
+	</insert>
+	
+	<!-- 根据主键有选择的更新餐桌信息 -->
+	<update id="updateByPrimaryKeySelective" parameterType="cn.edu.zzti.biz.entity.DiningTable" >
+        update tb_os_dining_table
+        <set >
+        <if test="tableCode != null" >
+          table_code = #{tableCode,jdbcType=VARCHAR},
+        </if>
+        <if test="tableSize != null" >
+          table_size = #{tableSize,jdbcType=INTEGER},
+        </if>
+        <if test="createDate != null" >
+          create_date = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateDate != null" >
+          update_date = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="tableStatus != null" >
+          table_status = #{tableStatus,jdbcType=INTEGER},
+        </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    
+    <!-- 根据主键删除餐桌信息 -->
+    <delete id="deleteByPrimiaryKey" parameterType="java.lang.Long">
+        delete
+        from tb_os_dining_table
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+</mapper>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.zzti.sys.dao.ISysUserDao">
+
+	<resultMap type="cn.edu.zzti.sys.entity.SysUser" id="BaseResultMap">
+		<result property="id" column="id" jdbcType="BIGINT" />
+		<result property="username" column="username" jdbcType="VARCHAR" />
+		<result property="password" column="password" jdbcType="VARCHAR" />
+		<result property="realname" column="realname" jdbcType="VARCHAR" />
+		<result property="gender" column="gender" jdbcType="INTEGER" />
+		<result property="phone" column="phone" jdbcType="VARCHAR" />
+		<result property="email" column="email" jdbcType="VARCHAR" />
+		<result property="address" column="address" jdbcType="VARCHAR" />
+		<result property="createDate" column="create_date" jdbcType="TIMESTAMP" />
+		<result property="updateDate" column="update_date" jdbcType="TIMESTAMP" />
+		<result property="userStatus" column="user_status" jdbcType="INTEGER" />
+		<result property="remark" column="remark" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, username,password,realname,gender,phone,email,address,create_date,update_date,user_status,remark
+	</sql>
+
+    <!-- 根据主键查询用户信息  -->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+         select 
+         <include refid="Base_Column_List" />
+         from tb_sys_user user
+         where user.id = #{id,jdbcType=BIGINT}
+    </select>
+
+	<!-- 获取用户列表，分页 -->
+	<select id="getSysUserList" parameterType="java.util.Map" resultMap="BaseResultMap">
+		 select 
+	     <include refid="Base_Column_List" />
+	     from tb_sys_user user
+	     where user.user_status &lt;&gt; -1
+	     order by user.id desc
+	   	 limit #{page.start},#{page.limit}
+	</select>
+    
+    <!-- 获取系统用户总记录条数 -->
+	<select id="getCount" resultType="int">
+		select count(id)
+		from tb_sys_user user
+		where user.user_status &lt;&gt; -1
+	</select>
+	
+	<!-- 通过用户名获取用户数量 -->
+	<select id="getUserNumber" parameterType="java.util.Map" resultType="int">
+	    select count(id)
+	    from tb_sys_user user
+	    where user.username = #{username,jdbcType=VARCHAR} 
+	    and user.user_status &lt;&gt; -1
+	    <if test="op != null and op != '' and op == 'modify' " >
+	    and id &lt;&gt; #{id,jdbcType=BIGINT}
+	    </if>
+	</select>
+	
+	<!-- 插入一条用户记录 -->
+	<insert id="insert" parameterType="cn.edu.zzti.sys.entity.SysUser" >
+        insert into tb_sys_user (id, username, realname, password, gender,
+           phone, email, address, create_date, update_date, user_status, remark)
+        values (#{id,jdbcType=BIGINT},  #{username,jdbcType=VARCHAR}, #{realname,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+           #{gender,jdbcType=INTEGER}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},
+           #{createDate,jdbcType=TIMESTAMP},  #{updateDate,jdbcType=TIMESTAMP}, #{userStatus,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR})
+    </insert>
+    
+    <!-- 管理员为用户重置密码 -->
+    <update id="resetPasswordByPrimaryKey" parameterType="java.util.Map" >
+        update tb_sys_user user
+        set user.password = #{password,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    
+    <!-- 根据主键有选择的更新用户信息 -->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.edu.zzti.sys.entity.SysUser" >
+        update tb_sys_user
+        <set >
+        <if test="username != null" >
+          username = #{username,jdbcType=VARCHAR},
+        </if>
+        <if test="realname != null" >
+          realname = #{realname,jdbcType=VARCHAR},
+        </if>
+        <if test="password != null" >
+          password = #{password,jdbcType=VARCHAR},
+        </if>
+        <if test="phone != null" >
+          phone = #{phone,jdbcType=VARCHAR},
+        </if>
+        <if test="address != null" >
+          address = #{address,jdbcType=VARCHAR},
+        </if>
+        <if test="email != null" >
+          email = #{email,jdbcType=VARCHAR},
+        </if>
+        <if test="remark != null" >
+          remark = #{remark,jdbcType=VARCHAR},
+        </if>
+        <if test="gender != null" >
+          gender = #{gender,jdbcType=INTEGER},
+        </if>
+        <if test="createDate != null" >
+          create_date = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateDate != null" >
+          update_date = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="userStatus != null" >
+          user_status = #{userStatus,jdbcType=INTEGER},
+        </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    
+    <!-- 根据主键删除用户信息 -->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+        delete from tb_sys_user
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    
+</mapper>

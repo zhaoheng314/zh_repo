@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.zzti.sys.dao.ISysRolePrivilegeDao">
+
+	<resultMap type="cn.edu.zzti.sys.entity.SysRolePrivilege" id="BaseResultMap">
+		<result property="id" column="id" jdbcType="BIGINT" />
+		<result property="roleId" column="role_id" jdbcType="BIGINT" />
+		<result property="privilegeId" column="privilege_id" jdbcType="BIGINT" />
+		<result property="createDate" column="create_date" jdbcType="TIMESTAMP" />		
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,role_id,privilege_id,create_date
+	</sql>
+	
+	<!-- 根据角色编号获取角色拥有的权限 -->	
+	<select id="getPrivilegeByRoleId" parameterType="java.lang.Long" resultType="java.lang.Long">
+	    select 
+	    privilege_id
+	    from rt_sys_role_privilege
+	    where role_id = #{roleId,jdbcType=BIGINT}
+	</select>
+	
+	<!-- 批量插入角色权限记录 -->
+	<insert id="insertList" parameterType="java.util.List">
+	    insert
+        into rt_sys_role_privilege (role_id, privilege_id, create_date)
+        values 
+        <foreach collection="list" item="sysRolePrivilege" separator=",">
+			(
+			#{sysRolePrivilege.roleId,jdbcType=BIGINT},
+			#{sysRolePrivilege.privilegeId,jdbcType=BIGINT},
+			#{sysRolePrivilege.createDate,jdbcType=TIMESTAMP}
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 根据角色编号删除角色拥有的权限信息 -->
+	<delete id="deletePrivilegeByRoleId" parameterType="java.lang.Long">
+	    delete
+	    from rt_sys_role_privilege
+	    where role_id = #{roleId,jdbcType=BIGINT}
+	</delete>
+</mapper>

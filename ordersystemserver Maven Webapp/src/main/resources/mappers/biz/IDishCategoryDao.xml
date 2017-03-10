@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.edu.zzti.biz.dao.IDishCategoryDao">
+
+	<resultMap type="cn.edu.zzti.biz.entity.DishCategory" id="BaseResultMap">
+		<result property="id" column="id" jdbcType="BIGINT" />
+		<result property="categoryName" column="category_name" jdbcType="VARCHAR" />
+		<result property="createDate" column="create_date" jdbcType="TIMESTAMP" />
+		<result property="updateDate" column="update_date" jdbcType="TIMESTAMP" />
+		<result property="categoryStatus" column="category_status" jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id,category_name,create_date,update_date,category_status
+	</sql>
+	
+	<!-- 根据主键获取菜品类别对象 -->
+	<select id="selectByPrimiaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+	    select
+	    <include refid="Base_Column_List" />
+	    from tb_os_dish_category
+	    where id = #{id,jdbcType=BIGINT}
+	</select>
+	
+	<!-- 获取菜品类别列表，分页 -->
+	<select id="getCategoryList" parameterType="java.util.Map" resultMap="BaseResultMap">
+	    select
+	    <include refid="Base_Column_List" />
+	    from tb_os_dish_category category
+	    where category.category_status &lt;&gt; -1
+	    order by id desc
+	    limit #{page.start},#{page.limit}
+	</select>
+	
+	<!-- 获取所有菜品分类信息 -->
+	<select id="getAllCategory" parameterType="java.util.Map" resultMap="BaseResultMap">
+	    select 
+	    <include refid="Base_Column_List" />
+	    from tb_os_dish_category category
+	    where category.category_status &lt;&gt; -1
+	    <if test="categoryId != null and categoryId != ''">
+	    and id &lt;&gt; #{categoryId,jdbcType=BIGINT}
+	    </if>
+	    order by id desc
+	</select>
+	
+	<!-- 获取菜品类别总数 -->
+	<select id="getCount" resultType="int">
+	    select count(id)
+	    from tb_os_dish_category
+	    where category_status &lt;&gt; -1
+	</select>
+	
+	<!-- 通过菜品类别名称获取菜品类别数量 -->
+	<select id="getCategoryNumber" parameterType="java.util.Map" resultType="int">
+	    select count(id)
+	    from tb_os_dish_category category
+	    where category.category_name = #{categoryName,jdbcType=VARCHAR} 
+	    and category.category_status &lt;&gt; -1
+	    <if test="op != null and op != '' and op == 'modify' " >
+	    and id &lt;&gt; #{id,jdbcType=BIGINT}
+	    </if>
+	</select>
+	
+	<!-- 插入一条菜品类别记录 -->
+	<insert id="insert" parameterType="cn.edu.zzti.biz.entity.DishCategory">
+	    insert into tb_os_dish_category (id, category_name, create_date, 
+	       update_date, category_status)
+	    values (#{id,jdbcType=BIGINT}, #{categoryName,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP},
+	       #{updateDate,jdbcType=TIMESTAMP},  #{categoryStatus,jdbcType=INTEGER})
+	</insert>
+	
+	<!-- 根据主键有选择的更新菜品类别信息 -->
+	<update id="updateByPrimaryKeySelective" parameterType="cn.edu.zzti.biz.entity.DishCategory" >
+        update tb_os_dish_category
+        <set >
+        <if test="categoryName != null" >
+          category_name = #{categoryName,jdbcType=VARCHAR},
+        </if>
+        <if test="createDate != null" >
+          create_date = #{createDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="updateDate != null" >
+          update_date = #{updateDate,jdbcType=TIMESTAMP},
+        </if>
+        <if test="categoryStatus != null" >
+          category_status = #{categoryStatus,jdbcType=INTEGER},
+        </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    
+    <!-- 根据主键删除菜品类别信息 -->
+    <delete id="deleteByPrimiaryKey" parameterType="java.lang.Long">
+        delete
+        from tb_os_dish_category
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+</mapper>
