@@ -152,7 +152,7 @@
                 <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
                     <div class="navbar-header">
                          <div class="form-group">
-                              <h2><span style="font-family:serif;">使用基于ARM的嵌入式无线点餐机的后台管理系统</span></h2>
+                              <h2><span style="font-family:serif;">欢迎你使用基于ARM的嵌入式无线点餐机的后台管理系统</span></h2>
                          </div>
                     </div>
                 </nav>
