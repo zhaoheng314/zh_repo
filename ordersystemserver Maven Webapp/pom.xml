@@ -13,7 +13,7 @@
        <maven.compile.source>1.7</maven.compile.source>
        <maven.compile.target>1.7</maven.compile.target>
 	   <!-- spring版本号 -->
-	   <spring.version>4.0.2.RELEASE</spring.version>
+	   <spring.version>5.2.20.RELEASE</spring.version>
 	   <!-- mybatis版本号 -->
 	   <mybatis.version>3.2.2</mybatis.version>
 	   <!-- log4j日志文件管理包版本 -->
